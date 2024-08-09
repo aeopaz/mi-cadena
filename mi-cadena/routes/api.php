@@ -21,4 +21,6 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('auth/login', [AuthController::class, 'login']);
+Route::post('auth/password_reset_link', [AuthController::class, 'password_reset_link']);
+Route::post('auth/password_reseted', [AuthController::class, 'password_reseted']);
 Route::post('/user', [UserController::class, 'store']);

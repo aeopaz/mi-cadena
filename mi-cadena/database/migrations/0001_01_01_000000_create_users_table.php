@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name')->comment('Nombre completo del usuario.');
             $table->string('email')->unique()->comment('Correo electrónico del usuario (único).');
             $table->string('mobile')->unique()->comment('Número celular  del usuario (único).');
+            $table->string('code_email_verify')->nullable()->comment('Código para verificar email.');
             $table->timestamp('email_verified_at')->nullable()->comment('Fecha y hora de la verificación de correo electrónico.');
             $table->string('password')->comment('Contraseña cifrada.');
             $table->rememberToken();
@@ -26,7 +27,7 @@ return new class extends Migration
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
-            $table->timestamp('created_at')->nullable();
+            $table->timestamps();
         });
 
         Schema::create('sessions', function (Blueprint $table) {

@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\User\VerifyEmailNotification;
+use App\Traits\ResponseTrait;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
+
+    use ResponseTrait;
     /**
      * Display a listing of the resource.
      */
@@ -30,10 +35,11 @@ class UserController extends Controller
         ]);
 
         $user = User::create($request->all());
+        $user->code_email_verify = rand(111111, 999999);
+        $user->save();
+        $user->notify(new VerifyEmailNotification($user->code_email_verify));
 
-        return $this->server_response_ok("", [
-            "user" => $user
-        ]);
+        return $this->server_response_ok("Por favor ingresa el token enviado a tu correo para confirmarlo", ["user" => $user]);
     }
 
     /**

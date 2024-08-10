@@ -8,6 +8,7 @@ use App\Notifications\User\VerifyEmailNotification;
 use App\Traits\ResponseTrait;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
@@ -42,12 +43,36 @@ class UserController extends Controller
         return $this->server_response_ok("Por favor ingresa el token enviado a tu correo para confirmarlo", ["user" => $user]);
     }
 
+    public function verify_user_email(Request $request)
+    {
+        $request->validate([
+            "email" => "required|email|exists:users,email",
+            'code' => 'required',
+        ]);
+
+        $email = $request->email;
+        $code = $request->code;
+
+        $is_validate_code_user = User::where('email', $email)->where('code_email_verify', $code)->first();
+
+        if (!$is_validate_code_user) {
+            return $this->server_response_error("El código ingresado es inválido", null, 400);
+        }
+
+        $is_validate_code_user->email_verified_at = now();
+        $is_validate_code_user->save();
+
+        return $this->server_response_ok("El email ha sido confirmado", null);
+    }
+
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        return $this->server_response_ok('', ["user" => $user]);
     }
 
     /**
@@ -55,7 +80,15 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|string',
+            'mobile' => ['required', Rule::unique("users", "mobile")->ignore($id, "mobile")],
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update($request->all());
+
+        return $this->server_response_ok("Usuario actualizado",["user"=>$user]);
     }
 
     /**
@@ -63,6 +96,9 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return $this->server_response_ok("Usuario eliminado",null);
     }
 }

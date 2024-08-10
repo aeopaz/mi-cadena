@@ -37,7 +37,7 @@ class VerifyEmailNotification extends Notification
     {
         return (new MailMessage)
                     ->line('Código para confirmar tu correo:')
-                    ->action($this->code, url('/'))
+                    ->action($this->code, "#")
                     ->line('Thank you for using our application!');
     }
 

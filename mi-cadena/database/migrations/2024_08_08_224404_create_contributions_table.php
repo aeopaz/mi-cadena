@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id(); // id (PK): Identificador único de la aportación
             $table->unsignedBigInteger('participant_id'); // FK a Participants
             $table->decimal('amount', 10, 2); // Monto de la aportación
-            $table->date('contribution_date'); // Fecha en que se realizó la aportación
+            $table->date('estimated_contribution_date'); // Fecha en que se realizó la aportación
+            $table->date('real_contribution_date')->nullable(); // Fecha en que se realizó la aportación
             $table->string('status'); // Estado de la aportación (pendiente, completada)
             $table->timestamp('deleted_at')->nullable()->comment('Fecha y hora de la eliminacion.');
             $table->timestamps();

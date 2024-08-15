@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('participants', function (Blueprint $table) {
             $table->id(); // id (PK): Identificador único del participante
-            $table->unsignedBigInteger('savings_chain_id'); // FK a SavingsChains
+            $table->unsignedBigInteger('saving_chain_id'); // FK a SavingChain
             $table->unsignedBigInteger('user_id'); // FK a Users
-            $table->timestamp('joined_at'); // Fecha y hora en que el usuario se unió a la cadena
+            $table->timestamp('joined_at')->nullable(); // Fecha y hora en que el usuario se unió a la cadena
             $table->string('role'); // Rol del participante (creador, participante)
             $table->integer('turn_order'); // Orden en que el participante recibirá su aporte
+            $table->enum('status',['A','R','P'])->comment('Estado de la participación: A: Aceptar, R: Rechazar, P:Pendiente.'); // Orden en que el participante recibirá su aporte
             $table->timestamp('deleted_at')->nullable()->comment('Fecha y hora de la eliminacion.');
             $table->timestamps(); // created_at y updated_at
-
-            $table->foreign('savings_chain_id')->references('id')->on('savings_chains'); // FK a SavingsChains
+            $table->foreign('saving_chain_id')->references('id')->on('savings_chains'); // FK a SavingChain
             $table->foreign('user_id')->references('id')->on('users'); // FK a Users
         });
     }

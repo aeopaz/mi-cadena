@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Models\SavingsChains\SavingsChains;
+use App\Models\SavingChain\SavingChain;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,6 +61,11 @@ class User extends Authenticatable  implements JWTSubject
 
     public function savings_chains()
     {
-        return $this->hasMany(SavingsChains::class, "creator_id");
+        return $this->hasMany(SavingChain::class, "creator_id");
+    }
+
+    public function savings_chains_participating()
+    {
+        return $this->belongsToMany(SavingChain::class, "participants");
     }
 }

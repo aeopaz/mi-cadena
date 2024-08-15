@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\SavingsChains\SavingsChainsController;
+use App\Http\Controllers\SavingChain\ParticipantController;
+use App\Http\Controllers\SavingChain\SavingChainController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,7 @@ Route::post('auth/password_reseted', [AuthController::class, 'password_reseted']
 Route::post('/user', [UserController::class, 'store']);
 
 Route::middleware(['auth:api'])->group(function () {
+    Route::post('/user/send_code_verify_user_email', [UserController::class, 'send_code_verify_user_email']);
     Route::post('/user/verify_user_email', [UserController::class, 'verify_user_email']);
 
     Route::middleware(['verified'])->group(function () {
@@ -36,6 +38,11 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
-        Route::resource("/savings_chains", SavingsChainsController::class);
+        Route::resource("/savings_chains", SavingChainController::class);
+
+        Route::post("/participants/invite_users", [ParticipantController::class,'invite_users']);
+        Route::post("/participants/decision_invitation", [ParticipantController::class,'decision_invitation']);
+        Route::post("/participants/payment_register", [ParticipantController::class,'payment_register']);
+        Route::post("/participants/payment_reverse", [ParticipantController::class,'payment_reverse']);
     });
 });

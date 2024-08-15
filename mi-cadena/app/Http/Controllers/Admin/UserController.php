@@ -36,11 +36,27 @@ class UserController extends Controller
         ]);
 
         $user = User::create($request->all());
+        $request->merge(['email' => $user->email]);
+        $this->send_code_verify_user_email($request);
+
+        return $this->server_response_ok("Por favor ingresa el token enviado a tu correo para confirmarlo", ["user" => $user]);
+    }
+
+
+    public function send_code_verify_user_email(Request $request)
+    {
+        $request->validate([
+            "email" => "required|email|exists:users,email",
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
         $user->code_email_verify = rand(111111, 999999);
         $user->save();
         $user->notify(new VerifyEmailNotification($user->code_email_verify));
-
+        
         return $this->server_response_ok("Por favor ingresa el token enviado a tu correo para confirmarlo", ["user" => $user]);
+
     }
 
     public function verify_user_email(Request $request)
@@ -65,6 +81,7 @@ class UserController extends Controller
         return $this->server_response_ok("El email ha sido confirmado", null);
     }
 
+
     /**
      * Display the specified resource.
      */
@@ -88,7 +105,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->update($request->all());
 
-        return $this->server_response_ok("Usuario actualizado",["user"=>$user]);
+        return $this->server_response_ok("Usuario actualizado", ["user" => $user]);
     }
 
     /**
@@ -99,6 +116,6 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return $this->server_response_ok("Usuario eliminado",null);
+        return $this->server_response_ok("Usuario eliminado", null);
     }
 }

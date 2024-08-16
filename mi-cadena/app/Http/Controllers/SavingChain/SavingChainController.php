@@ -100,7 +100,18 @@ class SavingChainController extends Controller
     {
         $saving_chain = SavingChain::findOrFail($id);
         Gate::authorize('delete', $saving_chain);
-        $saving_chain->delete();
+
+        DB::transaction(function () use ($saving_chain) {
+
+            if ($saving_chain->participants->count() > 0) {
+
+                if ($saving_chain->participants->contributions->count() > 0) {
+                    $saving_chain->participants->contributions()->delete();
+                }
+                $saving_chain->participants()->delete();
+            }
+            $saving_chain->delete();
+        });
 
         return $this->server_response_ok("La Cadena de ahorro ha sido eliminada", null);
     }

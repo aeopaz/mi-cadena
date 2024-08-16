@@ -87,6 +87,21 @@ class ParticipantController extends Controller
         });
     }
 
+    public function invitation_destroy(Request $request)
+    {
+
+        $participant = Participant::findOrFail($request->participant_id);
+
+        Gate::authorize('update', $participant->saving_chain);
+
+        DB::transaction(function () use ($participant) {
+            $participant->contributions()->delete();
+            $participant->delete();
+        });
+
+        return $this->server_response_ok("La participación ha sido eliminada", null);
+    }
+
     public function generate_payment_plan(SavingChain $saving_chain, $participant_id)
     {
 
@@ -169,7 +184,7 @@ class ParticipantController extends Controller
     public function payment_reverse(Request $request)
     {
         $contribution = Contribution::findOrFail($request->contribution_id);
-        
+
         Gate::authorize('update', $contribution->participant->saving_chain);
 
         $request->merge([
@@ -177,8 +192,8 @@ class ParticipantController extends Controller
             "real_contribution_date" => null,
             "status"  => "D"
         ]);
-        
-    
+
+
         $contribution->update($request->all());
 
         return $this->server_response_ok("El pago ha sido reversado", ["contribution" => $contribution]);

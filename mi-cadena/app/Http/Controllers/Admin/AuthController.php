@@ -33,7 +33,8 @@ class AuthController extends Controller
         }
 
         return $this->server_response_ok("Ok Inicio Sesion", [
-            "token" => $token
+            "token" => $token,
+            "user" => auth()->user()
         ]);
     }
 

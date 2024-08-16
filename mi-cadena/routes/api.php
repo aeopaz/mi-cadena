@@ -42,6 +42,7 @@ Route::middleware(['auth:api'])->group(function () {
 
         Route::post("/participants/invite_users", [ParticipantController::class,'invite_users']);
         Route::post("/participants/decision_invitation", [ParticipantController::class,'decision_invitation']);
+        Route::post("/participants/invitation_destroy", [ParticipantController::class,'invitation_destroy']);
         Route::post("/participants/payment_register", [ParticipantController::class,'payment_register']);
         Route::post("/participants/payment_reverse", [ParticipantController::class,'payment_reverse']);
     });

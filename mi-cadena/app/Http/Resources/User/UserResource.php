@@ -19,6 +19,7 @@ class UserResource extends JsonResource
             "name" => $this->resource->name,
             "email" => $this->resource->email,
             "mobile" => $this->resource->mobile,
+            "email_verified" => $this->resource->email_verified_at==null?'n':'y',
         ];
     }
 }

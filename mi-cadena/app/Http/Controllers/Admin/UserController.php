@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\User\UserResource;
 use App\Models\SavingChain\Participant;
 use App\Models\User;
 use App\Notifications\User\VerifyEmailNotification;
@@ -31,7 +32,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|min:3',
             'email' => 'required|email|unique:users',
             'mobile' => 'required|digits:10|unique:users',
             'password' => ['required', 'confirmed', Password::min(8)]
@@ -41,7 +42,11 @@ class UserController extends Controller
         $request->merge(['email' => $user->email]);
         $this->send_code_verify_user_email($request);
 
-        return $this->server_response_ok("Por favor ingresa el token enviado a tu correo para confirmarlo", ["user" => $user]);
+        $token = auth('api')->attempt(array('email' => $request->email, 'password' => $request->password));
+        return $this->server_response_ok("Por favor ingresa el token enviado a tu correo para confirmarlo", [
+            "token" => $token,
+            "user" => new UserResource(auth()->user())
+        ]);
     }
 
 
@@ -53,7 +58,7 @@ class UserController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        $user->code_email_verify = rand(111111, 999999);
+        $user->code_email_verify = rand(1111, 9999);
         $user->save();
         $user->notify(new VerifyEmailNotification($user->code_email_verify));
 
@@ -115,8 +120,8 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::with('savings_chains_participating', 'savings_chains')->findOrFail($id);
-     
-       return  DB::transaction(function () use ($user) {
+
+        return  DB::transaction(function () use ($user) {
 
             //Operación de eliminar contribuciones y participaciones que tenga el usuario a cadenas
             if ($user->savings_chains_participating->count() > 0) {
@@ -127,10 +132,10 @@ class UserController extends Controller
                 // Desvincular las cadenas del usuario antes de eliminarlo
                 $user->savings_chains_participating()->detach();
             }
-          
+
             //Operación de eliminar las contribuciones y participaciones que tengan usuarios con las cadenas creadas por el usuario
             if ($user->savings_chains->count() > 0) {
-            return  $participants=  $user->savings_chains->load("participants");
+                return  $participants =  $user->savings_chains->load("participants");
                 if ($user->savings_chains->participants) {
 
                     if ($user->savings_chains->participants->contributions->count() > 0) {

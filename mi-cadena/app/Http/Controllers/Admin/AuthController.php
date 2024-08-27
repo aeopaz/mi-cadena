@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\User\UserResource;
 use App\Models\Auth\PasswordResetTokens;
 use App\Models\User;
 use App\Notifications\Auth\PasswordRecoveryLinkNotification;
@@ -34,7 +35,7 @@ class AuthController extends Controller
 
         return $this->server_response_ok("Ok Inicio Sesion", [
             "token" => $token,
-            "user" => auth()->user()
+            "user" => new UserResource(auth()->user())
         ]);
     }
 
@@ -46,7 +47,7 @@ class AuthController extends Controller
 
         $email = $request->email;
 
-        $token_password = rand(111111, 999999);
+        $token_password = rand(1111, 9999);
         $user = User::where('email', $email)->first();
 
         PasswordResetTokens::where("email", $email)->delete();

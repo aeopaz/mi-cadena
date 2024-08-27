@@ -15,4 +15,23 @@ trait DataConfigTrait
             "P" => "Pendiente",
         ];
     }
+
+    public function chains_status()
+    {
+
+        return  [
+            "A" => "Activa",
+            "C" => "Completada",
+            "N" => "Cancelada",
+        ];
+    }
+
+    public function frecuency_text()
+    {
+        return [
+            7=>'Semanal',
+            15=>'Quincenal',
+            30=>'Mensual'
+        ];
+    }
 }
